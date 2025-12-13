@@ -6,10 +6,15 @@ from src.utils import find_project_root
 class SocialGolferInstance:
     def __init__(self, file_name: str):
         self.m = None  # number of groups
-        self.n = None  # number of players per group
+        self.n = None  # number of golfers per group
         self.w = None  # number of weeks
 
         self._parse_file(file_name)
+
+        self.total_golfers = self.m * self.n
+
+    def __repr__(self):
+        return f"SocialGolferInstance(n_groups={self.m}, golfers_per_group={self.n}, n_weeks={self.w})"
 
     def _parse_file(self, file_name: str):
         """
@@ -32,9 +37,6 @@ class SocialGolferInstance:
         self.m = int(params[0])
         self.n = int(params[1])
         self.w = int(params[2])
-
-    def __repr__(self):
-        return f"SocialGolferInstance(n_groups={self.m}, n_players_per_group={self.n}, n_weeks={self.w})"
 
 if __name__ == '__main__':
     instance = SocialGolferInstance('sgp_4_3_3.txt')
