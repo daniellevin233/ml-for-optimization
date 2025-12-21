@@ -9,3 +9,5 @@ To create a zip archive for submission run:
 ```shell
 zip -r submission_assignment_1_DanielLevin_SmartNwamadu.zip ./ -x "venv/*" -x "*.lprof" -x "instances/*" -x "*.zip" -x ".git/*" -x ".idea/*" -x "*__pycache__/*"
 ```
+
+The report is in `report.pdf` as well as in https://www.overleaf.com/2581326695rvjqbyqhjskm#2b7302.
