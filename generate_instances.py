@@ -19,6 +19,8 @@ def is_valid_instance(m: int, n: int, w: int) -> bool:
     """Check if an instance has valid parameters."""
     if m < 2 or n < 2 or w < 1:
         return False
+    if w >= 2 and m < n:
+        return False
     max_weeks = theoretical_max_weeks(m, n)
     return w <= max_weeks
 
@@ -51,9 +53,9 @@ def generate_all_instances():
 
     print("\nGenerating diverse instances...")
 
-    # m (groups): 3-8, n (golfers per group): 3-7
+    # m (groups): 3-8, n (golfers per group): 3-8
     m_values = list(range(3, 10))
-    n_values = list(range(3, 8))
+    n_values = list(range(3, 9))
 
     for m in m_values:
         for n in n_values:

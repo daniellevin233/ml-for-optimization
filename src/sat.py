@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from pysat.formula import CNF
 from pysat.solvers import Solver
@@ -16,9 +16,10 @@ class SATSocialGolferSolver:
 
     def __repr__(self):
         try:
-            model = self.get_model()
+            model, time = self.get_model()
             return (f"{self.instance} is Satisfiable.\n"
-                    f"Model: {model}")
+                    f"Solved in {time:.4f} seconds.")
+                    # f"Model: {model}")
         except ValueError:
             return f"{self.instance} is Unsatisfiable."
 
@@ -210,14 +211,14 @@ class SATSocialGolferSolver:
         cnf = CNF(from_clauses=clauses)
         return cnf
 
-    def is_satisfiable(self) -> bool:
-        with Solver(bootstrap_with=self.cnf) as solver:
-            return solver.solve()
+    def is_satisfiable(self) -> tuple[bool, float]:
+        with Solver(bootstrap_with=self.cnf, use_timer=True) as solver:
+            return solver.solve(), solver.time()
 
-    def get_model(self):
-        with Solver(bootstrap_with=self.cnf) as solver:
+    def get_model(self) -> tuple[Any, float]:
+        with Solver(bootstrap_with=self.cnf, use_timer=True) as solver:
             if solver.solve():
-                return solver.get_model()
+                return solver.get_model(), solver.time()
             else:
                 raise ValueError("No satisfying variables assignments found")
 
@@ -236,7 +237,7 @@ class SATSocialGolferSolver:
         """
         from src.solution import SocialGolferSolution, Group, Week
 
-        model = self.get_model()
+        model, _ = self.get_model()
         model_set = set(model)
 
         x = self.instance.total_golfers
@@ -272,5 +273,5 @@ if __name__ == '__main__':
     instance = SocialGolferInstance('sgp_2_2_3.txt')
     print(SATSocialGolferSolver(instance))
 
-    instance = SocialGolferInstance('sgp_3_3_3.txt')
+    instance = SocialGolferInstance('sgp_5_3_6.txt')
     print(SATSocialGolferSolver(instance))

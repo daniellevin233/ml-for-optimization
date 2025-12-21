@@ -98,9 +98,8 @@ if __name__ == '__main__':
     # solution.construct_with_sat_solver()
     # print(solution)
 
-    # solution = SocialGolferSolution(SocialGolferInstance('sgp_2_2_3.txt'))
-    # noinspection LanguageDetectionInspection
-    solution = SocialGolferSolution(SocialGolferInstance('sgp_8_4_7.txt'))
+    solution = SocialGolferSolution(SocialGolferInstance('sgp_2_2_3.txt'))
+    # solution = SocialGolferSolution(SocialGolferInstance('sgp_8_4_7.txt'))
     solution.construct_with_sat_solver()
     # solution.weeks[-1].groups[0].golfers = [4, 3]
     # solution.weeks[-1].groups[1].golfers = [2, 1]
