@@ -1,9 +1,8 @@
-import numpy as np
 import random
 import math
 from collections import defaultdict
 import itertools
-from typing import List, Tuple, Dict
+from typing import List, Dict
 
 class SocialGolferScheduler:
     def __init__(self, golfers: int = 32, group_size: int = 4, weeks: int = 10):

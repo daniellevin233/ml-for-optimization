@@ -11,7 +11,7 @@ TIMEOUT_SECONDS = 60.0
 
 def load_dataset() -> pd.DataFrame:
     """Load the classification dataset."""
-    path = find_project_root() / "data" / "classification_dataset.csv"
+    path = find_project_root() / "data" / "sat_dataset.csv"
     return pd.read_csv(path)
 
 

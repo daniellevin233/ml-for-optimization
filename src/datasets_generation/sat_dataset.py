@@ -109,7 +109,7 @@ def generate_sat_dataset(
         instances_dir = find_project_root() / "instances"
 
     if output_path is None:
-        output_path = find_project_root() / "data" / "classification_dataset.csv"
+        output_path = find_project_root() / "data" / "sat_dataset.csv"
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
