@@ -111,67 +111,6 @@ def plot_decision_space(df: pd.DataFrame, save: bool = True):
     plt.show()
 
 
-def plot_decision_space_3d_view(df: pd.DataFrame, save: bool = True):
-    """
-    Alternative: 3 separate 2D views showing algorithm selection.
-
-    Args:
-        df: Combined dataset
-        save: Whether to save the plot
-    """
-    fig, axes = plt.subplots(1, 3, figsize=(18, 5))
-    fig.suptitle("Algorithm Selection: Instance Size to Dominating Algorithm", fontsize=16, fontweight="bold")
-
-    df_valid = df[df['best_algo'].notna()].copy()
-    sat_best = df_valid[df_valid['best_algo'] == 'sat']
-    sa_best = df_valid[df_valid['best_algo'] == 'sa']
-
-    # View 1: m vs n
-    axes[0].scatter(sat_best['m'], sat_best['n'], c='steelblue', s=60, alpha=0.6,
-                    edgecolors='darkblue', linewidths=0.5, label='SAT Best', marker='o')
-    axes[0].scatter(sa_best['m'], sa_best['n'], c='coral', s=60, alpha=0.6,
-                    edgecolors='darkred', linewidths=0.5, label='SA Best', marker='s')
-    axes[0].set_xlabel("Groups (m)", fontsize=11)
-    axes[0].set_ylabel("Golfers per Group (n)", fontsize=11)
-    axes[0].set_title("m vs n", fontsize=12, fontweight="bold")
-    axes[0].legend()
-    axes[0].grid(True, alpha=0.3)
-
-    # View 2: m vs w
-    axes[1].scatter(sat_best['m'], sat_best['w'], c='steelblue', s=60, alpha=0.6,
-                    edgecolors='darkblue', linewidths=0.5, label='SAT Best', marker='o')
-    axes[1].scatter(sa_best['m'], sa_best['w'], c='coral', s=60, alpha=0.6,
-                    edgecolors='darkred', linewidths=0.5, label='SA Best', marker='s')
-    axes[1].set_xlabel("Groups (m)", fontsize=11)
-    axes[1].set_ylabel("Weeks (w)", fontsize=11)
-    axes[1].set_title("m vs w", fontsize=12, fontweight="bold")
-    axes[1].legend()
-    axes[1].grid(True, alpha=0.3)
-
-    # View 3: n vs w
-    axes[2].scatter(sat_best['n'], sat_best['w'], c='steelblue', s=60, alpha=0.6,
-                    edgecolors='darkblue', linewidths=0.5, label='SAT Best', marker='o')
-    axes[2].scatter(sa_best['n'], sa_best['w'], c='coral', s=60, alpha=0.6,
-                    edgecolors='darkred', linewidths=0.5, label='SA Best', marker='s')
-    axes[2].set_xlabel("Golfers per Group (n)", fontsize=11)
-    axes[2].set_ylabel("Weeks (w)", fontsize=11)
-    axes[2].set_title("n vs w", fontsize=12, fontweight="bold")
-    axes[2].legend()
-    axes[2].grid(True, alpha=0.3)
-
-    plt.tight_layout()
-    plt.subplots_adjust(top=0.88)
-
-    if save:
-        plots_dir = find_project_root() / "plots"
-        plots_dir.mkdir(exist_ok=True)
-        filename = plots_dir / "decision_space_3views.png"
-        plt.savefig(filename, dpi=300, bbox_inches="tight")
-        print(f"Saved to {filename}")
-
-    plt.show()
-
-
 if __name__ == "__main__":
     df = load_combined_dataset()
     print(f"Loaded {len(df)} instances")
@@ -179,8 +118,4 @@ if __name__ == "__main__":
     print(f"SA best: {len(df[df['best_algo'] == 'sa'])}")
     print()
 
-    # Main 2D view
     plot_decision_space(df, save=True)
-
-    # Alternative: 3 views
-    plot_decision_space_3d_view(df, save=True)

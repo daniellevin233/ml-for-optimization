@@ -202,21 +202,6 @@ class AlgorithmSelector:
 
         return self.model.predict(X)
 
-    def predict_proba(self, X: pd.DataFrame) -> np.ndarray:
-        """
-        Predict probability of each algorithm being best.
-
-        Args:
-            X: Features
-
-        Returns:
-            Array of shape (n_samples, 2) with [P(sa), P(sat)]
-        """
-        if not self.is_trained:
-            raise ValueError("Model must be trained first")
-
-        return self.model.predict_proba(X)
-
 
 def run_algorithm_selection_experiment(
     test_size: float = 0.35,
