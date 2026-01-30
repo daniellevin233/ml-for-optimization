@@ -1,0 +1,183 @@
+\documentclass[a4paper]{scrartcl}
+
+\usepackage[a4paper, left=1.8cm, right=1.8cm, top=2.5cm, bottom=2cm]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath, amsfonts, amssymb}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{siunitx}
+\usepackage{caption}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{scrlayer-scrpage}
+\usepackage{xcolor}
+\usepackage{hyperref}
+
+\renewcommand{\arraystretch}{1.4}
+\pagestyle{scrheadings}
+\automark{section}
+\ohead{\pagemark}
+\cfoot{}
+
+% --- Document Info ---
+\title{ML-Enhanced Large Neighborhood Search \\ Project Report}
+\subtitle{Machine Learning for Optimization, WS 2025}
+\author{
+    Daniel Levin (12433760)
+}
+\date{}
+
+\begin{document}
+\maketitle
+
+% ============================================================
+% Problem Description
+% ============================================================
+\section{Problem: SCF-PDP}
+
+The \textbf{Selective Capacitated Fair Pickup and Delivery Problem (SCF-PDP)} is a vehicle routing problem where the goal is to design fair and feasible routes for a subset of customer requests.
+Each customer needs transportation of goods from a pickup location to a corresponding drop-off location.
+
+The problem is modeled on a complete directed graph $G = (V, A)$ where:
+\begin{itemize}
+    \item $V$ contains the vehicle depot plus all pickup/drop-off locations
+    \item $A = \{(u,v) : u,v \in V, u \neq v\}$ represents travel routes
+    \item Arc distances $a_{u,v} = \lceil\sqrt{(x_u - x_v)^2 + (y_u - y_v)^2}\rceil$ (rounded Euclidean)
+\end{itemize}
+
+There are $n$ customer requests $CR = \{1, \ldots, n\}$, each defined by pickup location $v_i^\uparrow$ and drop-off location $v_i^\downarrow$ with demand $c_i$.
+A fleet $K$ of $n_K$ identical vehicles with capacity $C$ serves requests starting from the depot.
+
+A feasible solution assigns routes $R_k$ to each vehicle $k \in K$ such that:
+\begin{itemize}
+    \item Vehicle capacity never exceeded along any route
+    \item Each served request handled entirely by one vehicle
+    \item At least $\gamma$ requests served across all vehicles
+\end{itemize}
+
+The objective minimizes total distance plus fairness penalty:
+\[
+\sum_{k \in K} d(R_k) + \rho \cdot (1 - J(R))
+\]
+where $d(R_k)$ is route $k$'s total distance and $J(R)$ is the Jain fairness index:
+\[
+J(R) = \frac{\left(\sum_{k \in K} d(R_k)\right)^2}{n_K \cdot \sum_{k \in K} d(R_k)^2}
+\]
+The fairness index $J(R) \in (0, 1]$ equals 1 when all routes have equal distance.
+Parameter $\rho$ controls the distance-fairness trade-off.
+
+% ============================================================
+% Baseline ALNS
+% ============================================================
+\section{Baseline: ALNS}
+
+The baseline implementation uses Adaptive Large Neighborhood Search (ALNS) with simulated annealing acceptance, developed and tuned in the Heuristic Optimization Techniques course.
+This section summarizes the key components.
+
+\subsection{Operators}
+
+The implementation uses 3 destroy and 3 repair operators, yielding 9 combinations.
+Each destroy operator removes $q$ requests sampled uniformly from $[10\%, 40\%]$ of served requests.
+
+\textbf{Destroy Operators:}
+\begin{itemize}
+    \item \textbf{Random}: Removes $q$ randomly selected requests (unbiased exploration)
+    \item \textbf{WorstCost}: Removes requests with highest distance contribution
+    \item \textbf{LongestRoute}: Removes from longest routes (targets fairness)
+\end{itemize}
+
+\textbf{Repair Operators:}
+\begin{itemize}
+    \item \textbf{Greedy}: Reinserts using flexible pickup-dropoff construction heuristic
+    \item \textbf{RandomGreedy}: Reinserts at random feasible positions
+    \item \textbf{ObjectiveAware}: Minimizes full objective including fairness penalty
+\end{itemize}
+
+\subsection{Adaptive Weight Mechanism}
+
+Operators are selected via roulette wheel with adaptive weights.
+Scores: 10 for new best, 1 for accepted, 0 for rejected.
+Weights update every 100 iterations using:
+\[
+\rho_i \leftarrow \rho_i \cdot (1 - \gamma) + \gamma \cdot \frac{s_i}{a_i}
+\]
+where $\gamma$ is the reaction factor, $s_i$ total score, and $a_i$ applications in the period.
+
+\subsection{Parameters}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{l l l}
+\toprule
+Parameter & Description & Default \\
+\midrule
+\texttt{max\_iterations} & Maximum iterations & 10000 \\
+\texttt{max\_time\_seconds} & Runtime limit & 300s \\
+\texttt{weight\_update\_period} & Weight update frequency & 100 \\
+\texttt{reaction\_factor} ($\gamma$) & Adaptation speed & 0.1 \\
+\texttt{min/max\_removal\_pct} & Removal range & 10\%-40\% \\
+\texttt{initial\_temperature} & SA start temperature & 100.0 \\
+\texttt{cooling\_rate} & Temperature decay & 0.99 \\
+\bottomrule
+\end{tabular}
+\caption{ALNS default parameters}
+\end{table}
+
+% ============================================================
+% MAB Operator Selection
+% ============================================================
+\section{Multi-Armed Bandit Operator Selection}
+
+% TODO: Describe MAB approach for operator selection
+% - UCB1 or Thompson Sampling
+% - How destroy operators are modeled as arms
+% - Reward signal definition
+% - Results and comparison with adaptive weights
+
+\subsection{Method}
+
+\subsection{Results}
+
+% ============================================================
+% RL Operator Selection
+% ============================================================
+\section{Reinforcement Learning Operator Selection}
+
+% TODO: Describe RL approach for operator selection
+% - State representation
+% - Action space (destroy operators)
+% - Reward function
+% - Learning algorithm (Q-learning, DQN, etc.)
+% - Results and comparison
+
+\subsection{Method}
+
+\subsection{Results}
+
+% ============================================================
+% Comparison
+% ============================================================
+\section{Comparison and Analysis}
+
+% TODO: Compare all three approaches
+% - Adaptive weights (baseline)
+% - MAB operator selection
+% - RL operator selection
+% - Statistical tests (Wilcoxon)
+% - Plots showing convergence, operator selection frequencies
+
+% ============================================================
+% Conclusion
+% ============================================================
+\section{Conclusion}
+
+% TODO: Summary of findings
+% - Which approach works best and when
+% - Trade-offs between methods
+% - Lessons learned
+
+\end{document}
