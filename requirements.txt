@@ -4,3 +4,5 @@ tqdm
 python-sat
 pandas
 scikit-learn
+pymhlib
+line_profiler

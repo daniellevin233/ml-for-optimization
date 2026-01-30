@@ -1,0 +1,18 @@
+{
+  "instance_size": 100,
+  "n_training_instances": 5,
+  "n_trials": 50,
+  "time_budget": 60.0,
+  "best_objective": 4384.640850460684,
+  "best_params": {
+    "weight_update_period": 407,
+    "reaction_factor": 0.31836911181633004,
+    "min_removal_pct": 0.11810170596769555,
+    "max_removal_pct": 0.43671961855957775,
+    "initial_temp": 266.9640916238191,
+    "cooling_rate": 0.9750185266615202,
+    "score_new_best": 9.96788043907638,
+    "score_accepted": 0.7760540240956147
+  },
+  "timestamp": "20260117_194414"
+}
