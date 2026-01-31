@@ -7780,3 +7780,163 @@ trailer << /Info 2 0 R /Root 1 0 R /Size 510 /ID [<5c2b98128b62b8d9b3a2baae327f6
 startxref
 1702292
 %%EOF
+2 0 obj
+<< /Creator (arXiv GenPDF \(tex2pdf:\)) /arXivID (https://arxiv.org/abs/2412.14382v3)
+/License (http://arxiv.org/licenses/nonexclusive-distrib/1.0/) /DOI (https://doi.org/10.48550/arXiv.2412.14382)
+/Author (Junyang Cai; Serdar Kadioglu; Bistra Dilkina) /ModDate (D:20260131131616Z00'00')
+/Title (Balans: Multi-Armed Bandits-based Adaptive Large Neighborhood Search for Mixed-Integer Programming Problem)
+/PTEX.Fullbanner (This is pdfTeX, Version 3.141592653-2.6-1.40.25 \(TeX Live 2023\) kpathsea version 6.3.5)
+/TemplateVersion (IJCAI.2025.0) /Producer (macOS Version 26.2 \(Build 25C56\) Quartz PDFContext, AppendMode 1.1)
+/Trapped /False >>
+endobj
+9 0 obj
+<< /Annots [ 19 0 R 20 0 R 21 0 R 22 0 R 23 0 R 24 0 R 25 0 R 26 0 R 27 0 R
+28 0 R 29 0 R 30 0 R 31 0 R 32 0 R 33 0 R 34 0 R 35 0 R 36 0 R 37 0 R 38 0 R
+39 0 R 40 0 R 41 0 R 42 0 R 43 0 R 44 0 R ] /Type /Page /MediaBox [ 0 0 612
+792 ] /Resources 49 0 R /Parent 12 0 R /Rotate 0 /Contents [ 45 0 R 46 0 R
+47 0 R 48 0 R ] >>
+endobj
+56 0 obj
+<< /Annots [ 104 0 R 105 0 R 106 0 R 107 0 R 108 0 R 109 0 R 110 0 R 111 0 R
+112 0 R ] /Type /Page /MediaBox [ 0 0 612 792 ] /Resources 115 0 R /Parent
+12 0 R /Rotate 0 /Contents 113 0 R /Group 114 0 R >>
+endobj
+57 0 obj
+<< /Annots 510 0 R /Type /Page /MediaBox [ 0 0 612 792 ] /Resources 135 0 R
+/Parent 12 0 R /Rotate 0 /Contents 134 0 R >>
+endobj
+58 0 obj
+<< /Annots [ 136 0 R 137 0 R 138 0 R 139 0 R 140 0 R 141 0 R 142 0 R ] /Type
+/Page /MediaBox [ 0 0 612 792 ] /Resources 144 0 R /Parent 12 0 R /Rotate
+0 /Contents 143 0 R >>
+endobj
+59 0 obj
+<< /Annots [ 145 0 R 146 0 R 147 0 R 148 0 R 149 0 R 150 0 R 151 0 R 152 0 R
+153 0 R 154 0 R 155 0 R 156 0 R ] /Type /Page /MediaBox [ 0 0 612 792 ] /Resources
+158 0 R /Parent 12 0 R /Rotate 0 /Contents 157 0 R >>
+endobj
+60 0 obj
+<< /Annots [ 159 0 R 160 0 R 161 0 R 162 0 R 163 0 R 164 0 R 165 0 R 166 0 R
+167 0 R 168 0 R 169 0 R ] /Type /Page /MediaBox [ 0 0 612 792 ] /Resources
+171 0 R /Parent 12 0 R /Rotate 0 /Contents 170 0 R /Group 114 0 R >>
+endobj
+61 0 obj
+<< /Annots [ 172 0 R 173 0 R 174 0 R 175 0 R 176 0 R 177 0 R 178 0 R 179 0 R
+180 0 R 181 0 R 182 0 R 183 0 R 184 0 R 185 0 R 186 0 R 187 0 R 188 0 R 189 0 R
+190 0 R 191 0 R 192 0 R 193 0 R 194 0 R 195 0 R 196 0 R 197 0 R ] /Type /Page
+/MediaBox [ 0 0 612 792 ] /Resources 199 0 R /Parent 13 0 R /Rotate 0 /Contents
+198 0 R >>
+endobj
+62 0 obj
+<< /Resources 201 0 R /Type /Page /Contents 200 0 R /Rotate 0 /MediaBox [
+0 0 612 792 ] /Parent 13 0 R >>
+endobj
+63 0 obj
+<< /Resources 203 0 R /Type /Page /Contents 202 0 R /Rotate 0 /MediaBox [
+0 0 612 792 ] /Parent 13 0 R >>
+endobj
+64 0 obj
+<< /Resources 205 0 R /Type /Page /Contents 204 0 R /Rotate 0 /MediaBox [
+0 0 612 792 ] /Parent 13 0 R >>
+endobj
+65 0 obj
+<< /Annots [ 206 0 R 207 0 R ] /Type /Page /MediaBox [ 0 0 612 792 ] /Resources
+209 0 R /Parent 13 0 R /Rotate 0 /Contents 208 0 R >>
+endobj
+66 0 obj
+<< /Annots [ 210 0 R ] /Type /Page /MediaBox [ 0 0 612 792 ] /Resources 212 0 R
+/Parent 13 0 R /Rotate 0 /Contents 211 0 R >>
+endobj
+67 0 obj
+<< /Annots [ 213 0 R ] /Type /Page /MediaBox [ 0 0 612 792 ] /Resources 215 0 R
+/Parent 14 0 R /Rotate 0 /Contents 214 0 R /Group 114 0 R >>
+endobj
+68 0 obj
+<< /Type /Page /MediaBox [ 0 0 612 792 ] /Resources 217 0 R /Parent 14 0 R
+/Rotate 0 /Contents 216 0 R /Group 114 0 R >>
+endobj
+69 0 obj
+<< /Type /Page /MediaBox [ 0 0 612 792 ] /Resources 219 0 R /Parent 14 0 R
+/Rotate 0 /Contents 218 0 R /Group 114 0 R >>
+endobj
+510 0 obj
+[ 116 0 R 117 0 R 118 0 R 119 0 R 120 0 R 121 0 R 122 0 R 123 0 R 124 0 R
+125 0 R 126 0 R 127 0 R 128 0 R 129 0 R 130 0 R 131 0 R 132 0 R 133 0 R 511 0 R
+]
+endobj
+511 0 obj
+<< /T (Daniel Levin) /AP << /N 512 0 R >> /Rect [ 315 242.1001 557.9996 272.9246
+] /M (D:20260131131555Z00'00') /C [ 0.980392 0.803922 0.352941 ] /DA (//Helvetica 12 Tf 0 g)
+/F 4 /Type /Annot /Border [ 0 0 0 ] /QuadPoints [ 522.242 272.9247 557.9978
+272.9247 522.242 264.0181 557.9978 264.0181 315 261.9656 557.9978 261.9656
+315 253.0591 557.9978 253.0591 315 251.0066 557.9996 251.0066 315 242.1001
+557.9996 242.1001 ] /Subtype /Highlight >>
+endobj
+512 0 obj
+<< /Length 342 /Type /XObject /FormType 1 /Resources 513 0 R /Subtype /Form
+/Filter /FlateDecode /BBox [ 0 0 242.9996 30.82456 ] >> stream
+x]“=nÃ0…w‚'`DR?äÜ!s¦Àh»¤Rß(­XŒPx°ü ?½÷™~ÀıâÂhf$£r©~?à~àò¶l;d4Íbì‹q?RÙ
+Á¾ÁåºSúÚsG·n(Xáû%)RåæÏ¾îÀ†&bäŠaf‘PÒæy™Zî##åî/Ä›#uWàiÂ`XÕM«új1b/£ÍCÅqSñëÔ’Gˆğs_4óÿ6øtÀT±"şĞ‘LZr––[mHÑzq„]IH^Ê#v-0¦–ŸĞ{î£æ(gV'l’WD¨Å)”m‰5wİI˜é§èÕ¦ïRyK‚¥
++ûLdhÈRªÕÅD1Sµìù'‚P&•ÚD`Rq¸‡‡OÖcëdÍÎy°%ËsTiağ*¾@X>¦ÿNÓz©}ÌÁí;W®Ÿ
+endstream
+endobj
+513 0 obj
+<< /ColorSpace << /Cs1 514 0 R >> /ProcSet [ /PDF ] /ExtGState << /Gs1 516 0 R
+>> >>
+endobj
+514 0 obj
+[ /ICCBased 515 0 R ]
+endobj
+515 0 obj
+<< /Alternate /DeviceRGB /Length 2612 /Filter /FlateDecode /N 3 >> stream
+x–wTSÙ‡Ï½7½Ğ" %ôz	 Ò;HQ‰I€P†„&vDF)VdTÀG‡"cEƒ‚b×	òPÆÁQDEåİŒk	ï­5óŞšıÇYßÙç·×Ùgï}×º Pü‚ÂtX€4¡XîëÁ\ËÄ÷XÀáffGøDÔü½=™™¨HÆ³öî.€d»Û,¿P&sÖÿ‘"7C$ 
+EÕ6<~&å”S³Å2ÿÊô•)2†12¡	¢¬"ãÄ¯lö§æ+»É˜—&ä¡YÎ¼4Œ»PŞš%á£Œ¡\˜%àg£|e½TIš å÷(ÓÓøœL 0™_Ìç&¡l‰2Eî‰ò ”Ä9¼r‹ù9h x¦gäŠ‰Ib¦×˜iåèÈfúñ³Sùb1+”ÃMáˆxLÏô´0€¯o–E%Ym™h‘í­ííYÖæhù¿Ùß~Sı=ÈzûUñ&ìÏAŒYßlì¬/½ ö$Z›³¾•U ´m@åá¬Oï  ò ´Şœó†l^’Äâ'‹ììlsŸk.+è7ûŸ‚oÊ¿†9÷™ËîûV;¦?#I3eEå¦§¦KDÌÌ—Ïdı÷ÿãÀ9iÍÉÃ,œŸÀñ…èUQè”	„‰h»…<X.d
+„Õá6'~khu_ }…9P¸IÈo= C#$n?z}ë[1
+È¾¼h­‘¯s2zşçú\ŠnáLA"Sæödr%¢,£ß„lÁt 
+4.0,`€3pŞ  „€H–.Hi@²A>Ø 
+A1Øvƒjp ÔzĞN‚6p\WÀp€G@
+†ÁK0Şi‚ğ¢Aª¤™BÖZyCAP8ÅC‰’@ùĞ&¨*ƒª¡CP=ô#tº]ƒú Ğ 4ı}„˜ÓaØ ¶€Ù°;GÂËàDxœÀÛáJ¸>·Âáğ ,…_Â“@ÈÑFXñDBX$!k‘"¤©Eš¤¹H‘qä‡¡a˜Æã‡YŒábVaÖbJ0Õ˜c˜VLæ6f3ù‚¥bÕ±¦X'¬?v	6›-ÄV``[°—±Øaì;ÇÀâp~¸\2n5®·×Œ»€ëÃá&ñx¼*Şï‚Ásğb|!¾
+ßÆ¿'	Zk‚!– $l$Tçı„Â4Q¨Ot"†yÄ\b)±ØA¼I&N“I†$R$)™´TIj"]&=&½!“É:dGrY@^O®$Ÿ _%’?P”(&OJEBÙN9J¹@y@yC¥R¨nÔXª˜ºZO½D}J}/G“3—ó—ãÉ­“«‘k•ë—{%O”×—w—_.Ÿ'_!Jş¦ü¸QÁ@ÁS£°V¡Fá´Â=…IEš¢•bˆbšb‰bƒâ5ÅQ%¼’’·O©@é°Ò%¥!BÓ¥yÒ¸´M´:ÚeÚ0G7¤ûÓ“éÅôè½ô	e%e[å(ååå³ÊRÂ0`ø3R¥Œ“Œ»Œó4æ¹ÏãÏÛ6¯i^ÿ¼)•ù*n*|•"•f••ªLUoÕÕªmªOÔ0j&jajÙjûÕ.«Ï§ÏwÏ_4ÿäü‡ê°º‰z¸újõÃê=ê“š¾U—4Æ5šnšÉšåšç4Ç´hZµZåZçµ^0•™îÌTf%³‹9¡­®í§-Ñ>¤İ«=­c¨³Xg£N³Î]’.[7A·\·SwBOK/X/_¯Qï¡>QŸ­Ÿ¤¿G¿[ÊÀĞ Ú`‹A›Á¨¡Š¡¿aa£ác#ª‘«Ñ*£Z£;Æ8c¶qŠñ>ã[&°‰I’IÉMSØÔŞT`ºÏ´Ïkæh&4«5»Ç¢°ÜYY¬FÖ 9Ã<È|£y›ù+=‹X‹İ_,í,S-ë,Y)YXm´ê°úÃÚÄšk]c}Ç†jãc³Î¦İæµ­©-ßv¿í};š]°İ»N»Ïöö"û&û1=‡x‡½÷Øtv(»„}Õëèá¸ÎñŒã'{'±ÓI§ßYÎ)ÎÎ£ğÔ-rÑqá¸r‘.d.Œ_xp¡ÔUÛ•ãZëúÌM×çvÄmÄİØ=Ùı¸û+K‘G‹Ç”§“çÏ^ˆ—¯W‘W¯·’÷bïjï§>:>‰>>¾v¾«}/øaııvúİó×ğçú×ûO8¬	è
+¤FV>2	uÃÁÁ»‚/Ò_$\ÔBüCv…<	5]ús.,4¬&ìy¸Ux~xw-bEDCÄ»HÈÒÈG‹KwFÉGÅEÕGME{E—EK—X,Y³äFŒZŒ ¦={$vr©÷ÒİK‡ãìâ
+ãî.3\–³ìÚrµå©ËÏ®_ÁYq*ßÿ‰Â©åL®ô_¹wå×“»‡û’çÆ+çñ]øeü‘—„²„ÑD—Ä]‰cI®IIãOAµàu²_òä©””£)3©Ñ©Íi„´ø´ÓB%aŠ°+]3='½/Ã4£0CºÊiÕîU¢@Ñ‘L(sYf»˜şLõHŒ$›%ƒY³j²ŞgGeŸÊQÌæôäšänËÉóÉû~5f5wug¾vş†üÁ5îk­…Ö®\Û¹Nw]Áºáõ¾ëm mHÙğËFËeßnŠŞÔQ Q°¾`h³ïæÆB¹BQá½-Î[lÅllíİf³­jÛ—"^ÑõbËâŠâO%Ü’ëßY}WùİÌö„í½¥ö¥ûwàvwÜİéºóX™bY^ÙĞ®à]­åÌò¢ò·»Wì¾Va[q`id´2¨²½J¯jGÕ§ê¤êšæ½ê{·íÚÇÛ×¿ßmÓÅ>¼È÷Pk­AmÅaÜá¬ÃÏë¢êº¿g_DíHñ‘ÏG…G¥ÇÂuÕ;Ô×7¨7”6Â’Æ±ãqÇoıàõC{«éP3£¹ø8!9ñâÇøï<ÙyŠ}ªé'ıŸö¶ĞZŠZ¡ÖÜÖ‰¶¤6i{L{ßé€ÓÎ-?›ÿ|ôŒö™š³ÊgKÏ‘Îœ›9Ÿw~òBÆ…ñ‹‰‡:Wt>º´äÒ®°®ŞË—¯^ñ¹r©Û½ûüU—«g®9];}}½í†ıÖ»–_ì~iéµïm½ép³ı–ã­¾}çú]û/Şöº}åÿ‹úî.¾{ÿ^Ü=é}ŞıÑ©^?Ìz8ıhıcìã¢'
+O*ª?­ıÕø×f©½ôì ×`Ï³ˆg†¸C/ÿ•ù¯OÃÏ©Ï+F´FêG­GÏŒùŒİz±ôÅğËŒ—Óã…¿)ş¶÷•Ñ«Ÿ~wû½gbÉÄğkÑë™?JŞ¨¾9úÖömçdèäÓwiï¦§ŠŞ«¾?öı¡ûcôÇ‘éìOøO•Ÿ?w|	üòx&mfæß÷„óû
+endstream
+endobj
+516 0 obj
+<< /Type /ExtGState /BM /Multiply >>
+endobj
+xref
+0 1
+0000000000 65535 f 
+2 1
+0001712650 00000 n 
+9 1
+0001713309 00000 n 
+56 14
+0001713647 00000 n 
+0001713868 00000 n 
+0001714006 00000 n 
+0001714196 00000 n 
+0001714426 00000 n 
+0001714663 00000 n 
+0001715005 00000 n 
+0001715127 00000 n 
+0001715249 00000 n 
+0001715371 00000 n 
+0001715521 00000 n 
+0001715663 00000 n 
+0001715820 00000 n 
+0001715957 00000 n 
+510 7
+0001716094 00000 n 
+0001716267 00000 n 
+0001716727 00000 n 
+0001717236 00000 n 
+0001717338 00000 n 
+0001717377 00000 n 
+0001720091 00000 n 
+trailer
+<< /ID [<5C2B98128B62B8D9B3A2BAAE327F6DEF><3C67BFC93B2E913BC4D40CF2A2D027EA> ] /Root 1 0 R /Size 517 /Prev 1702292 /Info 2 0 R >> 
+startxref
+1720145
+%%EOF

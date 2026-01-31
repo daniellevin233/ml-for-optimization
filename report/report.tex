@@ -38,7 +38,8 @@
 % ============================================================
 \section{Problem: SCF-PDP}
 
-The \textbf{Selective Capacitated Fair Pickup and Delivery Problem (SCF-PDP)} is a vehicle routing problem where the goal is to design fair and feasible routes for a subset of customer requests.
+The \textbf{Selective Capacitated Fair Pickup and Delivery Problem (SCF-PDP)} is a vehicle routing problem
+where the goal is to design fair and feasible routes for a subset of customer requests.
 Each customer needs transportation of goods from a pickup location to a corresponding drop-off location.
 
 The problem is modeled on a complete directed graph $G = (V, A)$ where:
@@ -48,7 +49,8 @@ The problem is modeled on a complete directed graph $G = (V, A)$ where:
     \item Arc distances $a_{u,v} = \lceil\sqrt{(x_u - x_v)^2 + (y_u - y_v)^2}\rceil$ (rounded Euclidean)
 \end{itemize}
 
-There are $n$ customer requests $CR = \{1, \ldots, n\}$, each defined by pickup location $v_i^\uparrow$ and drop-off location $v_i^\downarrow$ with demand $c_i$.
+There are $n$ customer requests $CR = \{1, \ldots, n\}$, each defined by pickup location $v_i^\uparrow$ and
+drop-off location $v_i^\downarrow$ with demand $c_i$.
 A fleet $K$ of $n_K$ identical vehicles with capacity $C$ serves requests starting from the depot.
 
 A feasible solution assigns routes $R_k$ to each vehicle $k \in K$ such that:
@@ -74,7 +76,8 @@ Parameter $\rho$ controls the distance-fairness trade-off.
 % ============================================================
 \section{Baseline: ALNS}
 
-The baseline implementation uses Adaptive Large Neighborhood Search (ALNS) with simulated annealing acceptance, developed and tuned in the Heuristic Optimization Techniques course.
+The baseline implementation uses Adaptive Large Neighborhood Search (ALNS) with simulated annealing acceptance,
+developed and tuned in the Heuristic Optimization Techniques course.
 This section summarizes the key components.
 
 \subsection{Operators}
@@ -132,15 +135,155 @@ Parameter & Description & Default \\
 % ============================================================
 \section{Multi-Armed Bandit Operator Selection}
 
-% TODO: Describe MAB approach for operator selection
-% - UCB1 or Thompson Sampling
-% - How destroy operators are modeled as arms
-% - Reward signal definition
-% - Results and comparison with adaptive weights
+The adaptive weight mechanism in baseline ALNS has several limitations:
+periodic updates introduce delayed feedback, purely proportional selection offers minimal exploration,
+and all operators are treated equally regardless of how well-tested they are.
+Multi-armed bandit (MAB) algorithms address these issues by providing explicit exploration mechanisms
+and immediate learning from each iteration.
 
 \subsection{Method}
 
+Applying MAB to ALNS operator selection requires three key design decisions:
+the definition of arms, the reward mechanism, and the learning policy.
+
+\subsubsection{Arms Definition}
+
+Each ALNS iteration requires selecting both a destroy and a repair operator.
+Three alternatives were considered for modeling this as a MAB problem:
+
+\begin{enumerate}
+    \item \textbf{Destroy operators only}: Model only the 3 destroy operators as arms and use a fixed repair strategy.
+    This approach appears in the BALANS paper~\cite{balans}, where repair is done via an exact MIP solver.
+    However, we have 3 diverse repair operators that provide complementary search behavior,
+    and fixing repair would waste this diversity. 
+    Additionally for the sake of clean comparison with the existing adaptive approach, it is beneficial to use the 
+    same operators and focus puerly on their selection strategies.  
+
+    \item \textbf{Operator pairs}: Model all $3 \times 3 = 9$ destroy-repair combinations as individual arms.
+    This captures potential synergies between specific operators (e.g., WorstCost + Greedy may work differently than Random + Greedy).
+    However, 9 arms significantly slows learning compared to 6 arms, and interpreting which combinations work well becomes less clear.
+
+    \item \textbf{Independent selection} (chosen): Maintain two independent MAB instances---one for destroy operators (3 arms)
+    and one for repair operators (3 arms). Each iteration selects from both independently.
+    This explores the full $3 \times 3$ space with only 6 total arms, accelerating learning while matching baseline ALNS behavior.
+\end{enumerate}
+
+The independent selection approach balances exploration efficiency with operator diversity.
+
+\subsubsection{Reward Mechanism}
+
+The reward function defines what constitutes "success" for an operator.
+Three options were considered:
+
+\begin{enumerate}
+    \item \textbf{Binary (0/1)}: Reward of 1 if the iteration improves the current solution, 0 otherwise.
+    This is simple and aligns naturally with Thompson Sampling's Beta-Bernoulli conjugate prior,
+    but ignores the magnitude of improvement.
+
+    \item \textbf{Continuous ($\Delta$ objective)}: Reward equals the actual objective improvement $(f_{\text{old}} - f_{\text{new}})$.
+    This captures improvement magnitude but requires different priors for Thompson Sampling (e.g., Normal-Gamma)
+    and can be sensitive to problem scaling.
+
+    \item \textbf{Tiered (10/1/0)} (chosen): Reward of 10 if the iteration finds a new global best solution,
+    1 if it improves the current solution (accepted by simulated annealing), and 0 otherwise.
+    This matches the baseline scoring system and emphasizes discovering high-quality solutions,
+    not just local improvements.
+\end{enumerate}
+
+For Thompson Sampling, which requires binary feedback for Beta distributions,
+tiered rewards are converted to binary: any positive reward counts as success.
+
+\subsubsection{Learning Policies}
+
+Two MAB algorithms are compared against the adaptive weight baseline:
+
+\textbf{UCB1 (Upper Confidence Bound)}:
+Selects the operator with the highest upper confidence bound:
+\[
+\text{UCB}_i(t) = \bar{r}_i + c \sqrt{\frac{\ln t}{n_i}}
+\]
+where $\bar{r}_i$ is the average reward for operator $i$, $t$ is the total number of selections,
+$n_i$ is the number of times operator $i$ has been selected, and $c$ is an exploration constant (default 1.0).
+The second term provides an explicit exploration bonus: operators that have been selected less frequently
+get higher confidence bounds, encouraging balanced exploration.
+
+\textbf{Thompson Sampling}:
+Maintains a Beta distribution $\text{Beta}(\alpha_i, \beta_i)$ for each operator $i$,
+representing the posterior belief about its success probability.
+At each iteration, a sample $\theta_i \sim \text{Beta}(\alpha_i, \beta_i)$ is drawn for each operator,
+and the operator with the highest sample is selected.
+After observing the outcome, the distribution is updated:
+$\alpha_i \leftarrow \alpha_i + 1$ if the reward was positive (success), otherwise $\beta_i \leftarrow \beta_i + 1$.
+Thompson Sampling naturally balances exploration and exploitation through probabilistic sampling,
+and is known to perform well in non-stationary environments where operator effectiveness may change during the search.
+
+Both algorithms update immediately after each iteration, providing faster adaptation than the baseline's periodic updates.
+
+\subsection{Research Questions}
+
+The experiments aim to answer:
+\begin{itemize}
+    \item \textbf{RQ1}: Does MAB-based selection outperform adaptive weights in terms of solution quality?
+    \item \textbf{RQ2}: Which MAB algorithm (UCB1 or Thompson Sampling) performs best?
+    \item \textbf{RQ3}: How does operator selection evolve over time (exploration to exploitation)?
+\end{itemize}
+
 \subsection{Results}
+
+% Placeholder for comparison table
+\begin{table}[H]
+\centering
+\caption{Solution quality comparison: Adaptive Weights vs. MAB algorithms}
+\label{tab:mab-comparison}
+\begin{tabular}{l c c c c}
+\toprule
+Algorithm & Mean Obj. & Std Dev & Wins & $p$-value \\
+\midrule
+Adaptive Weights & --- & --- & --- & --- \\
+UCB1 & --- & --- & --- & --- \\
+Thompson Sampling & --- & --- & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% Placeholder for convergence plot
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{placeholder_convergence.png}
+\caption{Convergence comparison: best objective value over iterations}
+\label{fig:convergence}
+\end{figure}
+
+% Placeholder for operator evolution plot
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{placeholder_operator_evolution.png}
+\caption{Operator selection frequency over time segments (destroy operators)}
+\label{fig:operator-evolution}
+\end{figure}
+
+% Placeholder for operator performance table
+\begin{table}[H]
+\centering
+\caption{Operator performance: average reward and selection frequency}
+\label{tab:operator-performance}
+\begin{tabular}{l c c c}
+\toprule
+Operator & Avg. Reward & Selection \% & Algorithm \\
+\midrule
+Random & --- & --- & --- \\
+WorstCost & --- & --- & --- \\
+LongestRoute & --- & --- & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Statistical significance is assessed using the Wilcoxon signed-rank test (paired, non-parametric)
+with significance level $\alpha = 0.05$.
+
+\subsection{Discussion}
+
+% TODO: Add discussion of results after experiments are run
 
 % ============================================================
 % RL Operator Selection
@@ -179,5 +322,17 @@ Parameter & Description & Default \\
 % - Which approach works best and when
 % - Trade-offs between methods
 % - Lessons learned
+
+% ============================================================
+% References
+% ============================================================
+\begin{thebibliography}{9}
+
+\bibitem{balans}
+Cai, J., Kadıoğlu, S., \& Dilkina, B. (2024).
+\textit{BALANS: Multi-Armed Bandits-based Adaptive Large Neighborhood Search}.
+arXiv preprint arXiv:2410.07393.
+
+\end{thebibliography}
 
 \end{document}
