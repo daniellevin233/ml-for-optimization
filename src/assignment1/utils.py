@@ -10,7 +10,7 @@ def find_project_root() -> Path:
     """
     current = Path.cwd()
     while current != current.parent:
-        if (current / "instances").exists():
+        if (current / "sgp_instances").exists():
             return current
         current = current.parent
     return Path.cwd()

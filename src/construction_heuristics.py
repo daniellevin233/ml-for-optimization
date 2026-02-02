@@ -388,22 +388,22 @@ if __name__ == '__main__':
 
     instance = competition_instance
 
-    # _initial_solution = SCFPDPSolution(inst=instance, use_delta_eval=True)
+    # _initial_solution = SCFPDPSolution(inst=instance)
     # GreedyConstructionHeuristic(_initial_solution).construct()
     # print("Greedy solution: ")
     # print(_initial_solution)
     #
-    # _initial_solution_1 = SCFPDPSolution(inst=instance, use_delta_eval=True)
+    # _initial_solution_1 = SCFPDPSolution(inst=instance)
     # RandomizedConstructionHeuristic(_initial_solution_1).construct()
     # print("\n\nRandomized solution: ")
     # print(_initial_solution_1)
     #
-    # _initial_solution_2 = SCFPDPSolution(inst=instance, use_delta_eval=True)
+    # _initial_solution_2 = SCFPDPSolution(inst=instance)
     # RandomizedHybridConstructionHeuristic(_initial_solution_2).construct()
     # print("\n\nRandomized solution 2: ")
     # print(_initial_solution_2)
 
-    _initial_solution_3 = SCFPDPSolution(inst=instance, use_delta_eval=True)
+    _initial_solution_3 = SCFPDPSolution(inst=instance)
     FlexiblePickupAndDropoffConstructionHeuristic(_initial_solution_3).construct()
     print("\n\nGreedy solution 2: ")
     print(_initial_solution_3)

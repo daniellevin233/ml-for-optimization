@@ -39,31 +39,17 @@ def run_single_experiment(
     selector_type: str,
     config: ALNSConfig
 ) -> ExperimentResult:
-    """
-    Run ALNS with specified selector on a single instance.
-
-    Args:
-        instance_path: Path to instance file
-        selector_type: "adaptive", "ucb1", or "thompson"
-        config: ALNS configuration
-
-    Returns:
-        ExperimentResult with statistics
-    """
     start_time = time.time()
 
-    # Load instance and create initial solution
     instance = SCFPDPInstance(str(instance_path))
     solution = SCFPDPSolution(instance)
     constructor = FlexiblePickupAndDropoffConstructionHeuristic(solution)
     constructor.construct()
     initial_objective = solution.calc_objective()
 
-    # Create operators
     destroy_ops = create_all_destroy_operators(config)
     repair_ops = create_all_repair_operators(config)
 
-    # Create selectors based on type
     if selector_type == "adaptive":
         destroy_selector = AdaptiveWeightSelector(destroy_ops)
         repair_selector = AdaptiveWeightSelector(repair_ops)
@@ -76,7 +62,6 @@ def run_single_experiment(
     else:
         raise ValueError(f"Unknown selector type: {selector_type}")
 
-    # Run ALNS
     alns = ALNS(
         solution,
         config=config,
@@ -105,7 +90,7 @@ def run_experiment_suite(
     instance_paths: list[Path],
     algorithms: list[str] = ["adaptive", "ucb1", "thompson"],
     config: ALNSConfig = None,
-    results_dir: Path = Path("results/mab_detailed")
+    results_dir: Path = Path("results/")
 ):
     """
     Run complete experiment suite and save results.
@@ -181,13 +166,13 @@ def print_summary_table(results: list[ExperimentResult]):
 
 if __name__ == "__main__":
     instance_paths = [
-        Path("scfpdp_instances/50/test_instance_n50_01.txt"),
-        Path("scfpdp_instances/50/test_instance_n50_02.txt"),
+        Path("100/competition/instance61_nreq100_nveh2_gamma91.txt"),
+        # Path("10/test_instance_small.txt"),
     ]
 
     config = ALNSConfig(
         max_iterations=500,
-        max_time_seconds=60.0,
+        max_time_seconds=300.0,
         log_interval=10000
     )
 

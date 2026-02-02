@@ -106,7 +106,7 @@ def generate_sat_dataset(
     n_workers: int = 5,
 ) -> pd.DataFrame:
     if instances_dir is None:
-        instances_dir = find_project_root() / "instances"
+        instances_dir = find_project_root() / "sgp_instances"
 
     if output_path is None:
         output_path = find_project_root() / "data" / "sat_dataset.csv"

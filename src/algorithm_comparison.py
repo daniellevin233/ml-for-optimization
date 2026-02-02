@@ -105,7 +105,7 @@ def run_algorithm_on_instance(
     start_time = time.time()
 
     # Load instance
-    solution = SCFPDPSolution(instance, use_delta_eval=True)
+    solution = SCFPDPSolution(instance)
     parsing_time = time.time() - start_time
 
     # Run construction heuristic
@@ -156,7 +156,7 @@ def compare_on_single_size(
     """
     # Load all instance files
     project_root = find_project_root()
-    instance_dir = project_root / "instances" / instance_size / instance_type
+    instance_dir = project_root / "scfpdp_instances" / instance_size / instance_type
     instance_files = sorted(instance_dir.glob("*.txt"))
 
     if not instance_files:

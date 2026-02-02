@@ -1,5 +1,3 @@
-"""Multi-Armed Bandit selection strategies for ALNS."""
-
 import numpy as np
 from typing import Dict, Any
 
@@ -29,7 +27,6 @@ class UCB1Selector(OperatorSelector[Operator]):
         self.total_count = 0
 
     def select(self, state: Dict[str, Any] = None) -> Operator:
-        """Select operator with highest UCB value."""
         # First, try each operator at least once
         for op in self.operators:
             if self.counts[op.name] == 0:
@@ -45,13 +42,11 @@ class UCB1Selector(OperatorSelector[Operator]):
         return next(op for op in self.operators if op.name == best_name)
 
     def update(self, operator: Operator, reward: float, next_state: Dict[str, Any] = None):
-        """Update statistics with observed reward."""
         self.counts[operator.name] += 1
         self.total_rewards[operator.name] += reward
         self.total_count += 1
 
     def get_statistics(self) -> Dict[str, Any]:
-        """Return UCB statistics."""
         return {
             "counts": dict(self.counts),
             "mean_rewards": {
@@ -110,7 +105,6 @@ class ThompsonSamplingSelector(OperatorSelector[Operator]):
 
 
 if __name__ == '__main__':
-    """Quick test of MAB selectors."""
     from src.instance import SCFPDPInstance
     from src.solution import SCFPDPSolution
     from src.construction_heuristics import FlexiblePickupAndDropoffConstructionHeuristic

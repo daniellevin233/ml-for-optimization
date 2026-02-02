@@ -139,11 +139,11 @@ The adaptive weight mechanism in baseline ALNS has several limitations:
 periodic updates introduce delayed feedback, purely proportional selection offers minimal exploration,
 and all operators are treated equally regardless of how well-tested they are.
 Multi-armed bandit (MAB) algorithms address these issues by providing explicit exploration mechanisms
-and immediate learning from each iteration.
+and immediate learning from each iteration~\cite{cai2024balans,phan2024balance}.
 
 \subsection{Method}
 
-Applying MAB to ALNS operator selection requires three key design decisions:
+Applying MAB to ALNS operator selection requires three key design decisions~\cite{cai2024balans}:
 the definition of arms, the reward mechanism, and the learning policy.
 
 \subsubsection{Arms Definition}
@@ -153,7 +153,7 @@ Three alternatives were considered for modeling this as a MAB problem:
 
 \begin{enumerate}
     \item \textbf{Destroy operators only}: Model only the 3 destroy operators as arms and use a fixed repair strategy.
-    This approach appears in the BALANS paper~\cite{balans}, where repair is done via an exact MIP solver.
+    This approach appears in the BALANS paper~\cite{cai2024balans}, where repair is done via an exact MIP solver.
     However, we have 3 diverse repair operators that provide complementary search behavior,
     and fixing repair would waste this diversity. 
     Additionally for the sake of clean comparison with the existing adaptive approach, it is beneficial to use the 
@@ -177,7 +177,7 @@ Three options were considered:
 
 \begin{enumerate}
     \item \textbf{Binary (0/1)}: Reward of 1 if the iteration improves the current solution, 0 otherwise.
-    This is simple and aligns naturally with Thompson Sampling's Beta-Bernoulli conjugate prior,
+    This is simple and aligns naturally with Thompson Sampling's Beta-Bernoulli conjugate prior~\cite{phan2024balance},
     but ignores the magnitude of improvement.
 
     \item \textbf{Continuous ($\Delta$ objective)}: Reward equals the actual objective improvement $(f_{\text{old}} - f_{\text{new}})$.
@@ -215,7 +215,7 @@ and the operator with the highest sample is selected.
 After observing the outcome, the distribution is updated:
 $\alpha_i \leftarrow \alpha_i + 1$ if the reward was positive (success), otherwise $\beta_i \leftarrow \beta_i + 1$.
 Thompson Sampling naturally balances exploration and exploitation through probabilistic sampling,
-and is known to perform well in non-stationary environments where operator effectiveness may change during the search.
+and is known to perform well in non-stationary environments where operator effectiveness may change during the search~\cite{phan2024balance}.
 
 Both algorithms update immediately after each iteration, providing faster adaptation than the baseline's periodic updates.
 
@@ -230,60 +230,164 @@ The experiments aim to answer:
 
 \subsection{Results}
 
-% Placeholder for comparison table
+Ran 120 instances (30 per size: 50, 100, 200, 500 requests) with 10k iterations each.
+Head-to-head comparisons on identical instances.
+
+\textbf{Adaptive vs Thompson} (Table~\ref{tab:adaptive-thompson}, Figure~\ref{fig:adaptive-thompson}):
+Thompson wins 67-53 with 0.63\% better total objective.
+Mixed results by size: Thompson wins at $n=50$ ($p=0.036$), Adaptive at $n=100$ ($p=0.045$), no significant difference for larger sizes.
+Slight edge to Thompson but the baseline stays competitive.
+
 \begin{table}[H]
 \centering
-\caption{Solution quality comparison: Adaptive Weights vs. MAB algorithms}
-\label{tab:mab-comparison}
-\begin{tabular}{l c c c c}
+\small
+\caption{Adaptive Weights vs Thompson Sampling by instance size}
+\label{tab:adaptive-thompson}
+\begin{tabular}{r r r r r r}
 \toprule
-Algorithm & Mean Obj. & Std Dev & Wins & $p$-value \\
+Size & Adaptive Obj & Thompson Obj & \% Diff & Wins (A/T) & $p$-value \\
 \midrule
-Adaptive Weights & --- & --- & --- & --- \\
-UCB1 & --- & --- & --- & --- \\
-Thompson Sampling & --- & --- & --- & --- \\
+50 & $1510 \pm 136$ & $1483 \pm 114$ & $+1.6\%$ & 10/20 & 0.036* \\
+100 & $3867 \pm 272$ & $3914 \pm 261$ & $-1.3\%$ & 20/10 & 0.045* \\
+200 & $10732 \pm 871$ & $10659 \pm 923$ & $+0.7\%$ & 12/18 & 0.299 \\
+500 & $42024 \pm 2572$ & $41712 \pm 2380$ & $+0.7\%$ & 11/19 & 0.164 \\
+\midrule
+\textbf{Total} & 1,743,960 & 1,733,022 & $+0.63\%$ & 53/67 & --- \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-% Placeholder for convergence plot
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{placeholder_convergence.png}
-\caption{Convergence comparison: best objective value over iterations}
+\includegraphics[width=0.95\textwidth]{Adaptive_vs_Thompson_50-100-200-500_20260131_201746}
+\caption{Adaptive vs Thompson: distribution of \% differences (positive = Thompson better) and win counts}
+\label{fig:adaptive-thompson}
+\end{figure}
+
+\textbf{Adaptive Weights vs UCB1} (Figure~\ref{fig:adaptive-ucb1}):
+Adaptive dominates with 102 wins vs 18, achieving 7.6\% lower total objective.
+The gap widens with instance size: from $-0.9\%$ at $n=50$ (not significant) to $-8.6\%$ at $n=500$ ($p < 10^{-9}$).
+UCB1's deterministic selection appears to over-exploit early successes, converging prematurely on suboptimal operators.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{Adaptive_vs_Ucb1_50-100-200-500_20260131_221456}
+\caption{Adaptive vs UCB1: Adaptive significantly outperforms, especially on larger instances}
+\label{fig:adaptive-ucb1}
+\end{figure}
+
+\textbf{UCB1 vs Thompson Sampling} (Figure~\ref{fig:ucb1-thompson}):
+Thompson wins 108 out of 120 instances with 7.5\% better total objective.
+The advantage is significant at all sizes ($p < 0.007$) and grows from $+2.7\%$ at $n=50$ to $+8.0\%$ at $n=500$.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{Ucb1_vs_Thompson_50-100-200-500_20260201_001945}
+\caption{UCB1 vs Thompson: Thompson dominates across all instance sizes}
+\label{fig:ucb1-thompson}
+\end{figure}
+
+Statistical significance assessed using Wilcoxon signed-rank test ($\alpha = 0.05$).
+
+\subsection{Case Study: Detailed Run Analysis}
+
+Looking at a single instance (\texttt{instance61\_nreq100\_nveh2\_gamma91}, 500 iterations) reveals the behavioral differences.
+
+\textbf{Convergence} (Figure~\ref{fig:convergence}):
+All three start at $\sim$4900 but diverge quickly.
+Thompson achieves the best result (4184.4, 15.0\% improvement), Adaptive is close behind (4202.5, 14.6\%), but UCB1 plateaus early (4394.0, only 9.8\%).
+UCB1 stagnates around iteration 150, while Thompson keeps finding improvements even past iteration 400.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.85\textwidth]{convergence_instance61_nreq100_nveh2_gamma91}
+\caption{Convergence on instance61: Thompson continues improving while UCB1 plateaus early}
 \label{fig:convergence}
 \end{figure}
 
-% Placeholder for operator evolution plot
+\textbf{Operator selection patterns:}
+
+\textbf{Thompson} (Figures~\ref{fig:thompson-destroy},~\ref{fig:thompson-repair}):
+Identifies the winning combination early and sticks with it: WorstCost (72\%) + Greedy (87\%).
+Frequencies stay stable throughout---no dramatic exploration-to-exploitation shift, just steady probabilistic sampling.
+
+\textbf{UCB1} (Figures~\ref{fig:ucb1-destroy},~\ref{fig:ucb1-repair}):
+Locks onto Random destroy (87\%) while barely using WorstCost (6\%)---the wrong choice!
+Thompson proves WorstCost is better, but UCB1's deterministic selection locked in after early luck.
+Gets repair right (87\% Greedy) but the bad destroy choice kills performance.
+
+\textbf{Adaptive} (Figures~\ref{fig:adaptive-destroy},~\ref{fig:adaptive-repair}):
+Maintains balanced diversity: destroy stays at 36\%/33\%/30\%, shifting gradually over time.
+Repair adapts more: Greedy grows from 35\% to 45\%.
+This diversity explains why Adaptive is competitive---no catastrophic over-commitment like UCB1.
+
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{placeholder_operator_evolution.png}
-\caption{Operator selection frequency over time segments (destroy operators)}
-\label{fig:operator-evolution}
+\begin{minipage}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{instance61_nreq100_nveh2_gamma91_Thompson_destroy_evolution}
+\caption{Thompson destroy operators}
+\label{fig:thompson-destroy}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{instance61_nreq100_nveh2_gamma91_Thompson_repair_evolution}
+\caption{Thompson repair operators}
+\label{fig:thompson-repair}
+\end{minipage}
 \end{figure}
 
-% Placeholder for operator performance table
-\begin{table}[H]
+\begin{figure}[H]
 \centering
-\caption{Operator performance: average reward and selection frequency}
-\label{tab:operator-performance}
-\begin{tabular}{l c c c}
-\toprule
-Operator & Avg. Reward & Selection \% & Algorithm \\
-\midrule
-Random & --- & --- & --- \\
-WorstCost & --- & --- & --- \\
-LongestRoute & --- & --- & --- \\
-\bottomrule
-\end{tabular}
-\end{table}
+\begin{minipage}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{instance61_nreq100_nveh2_gamma91_UCB1_destroy_evolution}
+\caption{UCB1 destroy: locks onto Random}
+\label{fig:ucb1-destroy}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{instance61_nreq100_nveh2_gamma91_UCB1_repair_evolution}
+\caption{UCB1 repair operators}
+\label{fig:ucb1-repair}
+\end{minipage}
+\end{figure}
 
-Statistical significance is assessed using the Wilcoxon signed-rank test (paired, non-parametric)
-with significance level $\alpha = 0.05$.
+\begin{figure}[H]
+\centering
+\begin{minipage}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{instance61_nreq100_nveh2_gamma91_Adaptive_destroy_evolution}
+\caption{Adaptive destroy: balanced selection}
+\label{fig:adaptive-destroy}
+\end{minipage}
+\hfill
+\begin{minipage}{0.48\textwidth}
+\centering
+\includegraphics[width=\textwidth]{instance61_nreq100_nveh2_gamma91_Adaptive_repair_evolution}
+\caption{Adaptive repair: gradual shift}
+\label{fig:adaptive-repair}
+\end{minipage}
+\end{figure}
 
 \subsection{Discussion}
 
-% TODO: Add discussion of results after experiments are run
+\textbf{Main findings:}
+Thompson Sampling wins overall (67-53 vs Adaptive, 108-12 vs UCB1) but the margin over the baseline is small (+0.6\%).
+UCB1 performs significantly worse (-7.6\% vs Adaptive) due to premature convergence---it locks onto Random destroy operator which happens to be the wrong choice.
+The baseline Adaptive Weights are surprisingly competitive because they maintain operator diversity (30-40\% for each), avoiding UCB1's catastrophic over-exploitation.
+
+\textbf{Why Thompson works:}
+Probabilistic sampling naturally balances exploration and exploitation.
+Even after identifying WorstCost as the best operator (72\% selection), it keeps sampling alternatives (15\% Random, 12\% LongestRoute).
+This prevents UCB1-style lock-in while still exploiting knowledge.
+
+\textbf{Bottom line:}
+For this problem, the simple baseline is hard to beat.
+Thompson provides marginal gains but adds complexity.
+If switching to MAB, only Thompson is viable---UCB1's deterministic selection is too greedy for long ALNS runs.
 
 % ============================================================
 % RL Operator Selection
@@ -328,10 +432,15 @@ with significance level $\alpha = 0.05$.
 % ============================================================
 \begin{thebibliography}{9}
 
-\bibitem{balans}
+\bibitem{cai2024balans}
 Cai, J., Kadıoğlu, S., \& Dilkina, B. (2024).
-\textit{BALANS: Multi-Armed Bandits-based Adaptive Large Neighborhood Search}.
+\textit{BALANS: Multi-Armed Bandits-based Adaptive Large Neighborhood Search for Mixed-Integer Programming Problems}.
 arXiv preprint arXiv:2410.07393.
+
+\bibitem{phan2024balance}
+Phan, T., Huang, T., Dilkina, B., \& Koenig, S. (2024).
+\textit{Adaptive Anytime Multi-Agent Path Finding Using Bandit-Based Large Neighborhood Search}.
+In Proceedings of the AAAI Conference on Artificial Intelligence (AAAI).
 
 \end{thebibliography}
 

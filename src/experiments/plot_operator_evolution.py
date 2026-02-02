@@ -222,42 +222,39 @@ def plot_operator_performance(
 
 
 if __name__ == "__main__":
-    """
-    Example usage:
-        python -m src.experiments.plot_operator_evolution
-    """
-    results_dir = Path("results/mab_experiment")
-    save_dir = Path("plots/operator_evolution")
+    results_dir = Path("src/experiments/results/")
+    save_dir = Path("plots/")
 
     if results_dir.exists():
         # Load statistics for one instance
-        instance_name = "test_instance_n50_01"
-        algorithm = "Thompson"
+        instance_name = "instance61_nreq100_nveh2_gamma91"
+        algorithm = "Adaptive"
 
         stats_file = results_dir / f"{instance_name}_{algorithm}.pkl"
-        if stats_file.exists():
-            with open(stats_file, 'rb') as f:
-                statistics = pickle.load(f)
-
-            # Plot destroy operator evolution
-            plot_operator_evolution(
-                statistics,
-                operator_type="destroy",
-                title=f"Destroy Operator Evolution - {algorithm}",
-                save_path=save_dir / f"{instance_name}_{algorithm}_destroy_evolution.png",
-                n_segments=5
-            )
-
-            # Plot repair operator evolution
-            plot_operator_evolution(
-                statistics,
-                operator_type="repair",
-                title=f"Repair Operator Evolution - {algorithm}",
-                save_path=save_dir / f"{instance_name}_{algorithm}_repair_evolution.png",
-                n_segments=5
-            )
-        else:
+        if not stats_file.exists():
             print(f"Statistics file {stats_file} not found")
+            exit(0)
+
+        with open(stats_file, 'rb') as f:
+            statistics = pickle.load(f)
+
+        # Plot destroy operator evolution
+        plot_operator_evolution(
+            statistics,
+            operator_type="destroy",
+            title=f"Destroy Operator Evolution - {algorithm}",
+            save_path=save_dir / f"{instance_name}_{algorithm}_destroy_evolution.png",
+            n_segments=5
+        )
+
+        # Plot repair operator evolution
+        plot_operator_evolution(
+            statistics,
+            operator_type="repair",
+            title=f"Repair Operator Evolution - {algorithm}",
+            save_path=save_dir / f"{instance_name}_{algorithm}_repair_evolution.png",
+            n_segments=5
+        )
     else:
         print(f"Results directory {results_dir} not found")
         print("Run experiments first to generate statistics")

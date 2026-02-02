@@ -38,7 +38,7 @@ def generate_instance_file(instances_dir: Path, m: int, n: int, w: int) -> str:
 
 
 def generate_all_instances():
-    instances_dir = Path("instances")
+    instances_dir = Path("sgp_instances")
     instances_dir.mkdir(exist_ok=True)
 
     generated = set()

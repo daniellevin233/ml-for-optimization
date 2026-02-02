@@ -1,7 +1,6 @@
 import pickle
 from pathlib import Path
 import matplotlib.pyplot as plt
-import numpy as np
 
 from src.alns.alns import ALNSStatistics
 
@@ -83,11 +82,11 @@ if __name__ == "__main__":
         python -m src.experiments.plot_convergence
     """
     # Example: Load and plot convergence
-    results_dir = Path("results/mab_experiment")
-    save_dir = Path("plots/convergence")
+    results_dir = Path("src/experiments/results")
+    save_dir = Path("plots/")
 
     if results_dir.exists():
-        instance_names = ["test_instance_n50_01"]  # User will specify
+        instance_names = ["instance61_nreq100_nveh2_gamma91"]
         plot_convergence_multiple_instances(
             results_dir=results_dir,
             instance_names=instance_names,

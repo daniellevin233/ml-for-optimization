@@ -27,6 +27,8 @@ BALANS is an **online meta-solver** for MIPs that uses Multi-Armed Bandits (MAB)
 
 ## Key MAB Formulation
 
+As stated in the paper: "To apply MAB, there are three important design decisions: the definition of arms, the reward mechanism, and the learning policy."
+
 **Reward Definition** (Critical for LNS):
 ```
 reward = {

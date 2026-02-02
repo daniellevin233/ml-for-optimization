@@ -24,11 +24,11 @@ class SocialGolferInstance:
         file_path = Path(file_name)
         if not file_path.is_absolute():
             project_root = find_project_root()
-            candidate = project_root / "instances" / file_name
+            candidate = project_root / "sgp_instances" / file_name
             if candidate.exists():
                 file_path = candidate
             else:
-                file_path = Path("instances") / file_name
+                file_path = Path("sgp_instances") / file_name
 
         with open(file_path, 'r') as f:
             lines = [line.strip() for line in f if line.strip()]
