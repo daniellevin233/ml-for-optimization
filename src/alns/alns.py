@@ -83,6 +83,7 @@ class ALNS:
         # Best and current solutions
         self.best_solution = initial_solution.copy()
         self.best_objective = initial_solution.calc_objective()
+        self.initial_objective = self.best_objective
         self.current_solution = initial_solution.copy()
         self.current_objective = self.best_objective
 
@@ -103,9 +104,29 @@ class ALNS:
             if self._should_stop(iteration):
                 break
 
-            # Select operators using selectors (strategy pattern)
-            destroy_op = self.destroy_selector.select()
-            repair_op = self.repair_selector.select()
+            # Build state dict for RL selectors
+            state = {
+                "current_objective": self.current_objective,
+                "best_objective": self.best_objective,
+                "initial_objective": self.initial_objective,
+                "temperature": self.temperature,
+                "initial_temperature": self.config.initial_temperature,
+                "iterations_without_improvement": self.iterations_without_improvement,
+                "iteration": iteration,
+                "max_iterations": self.config.max_iterations,
+                "statistics": self.statistics,
+            }
+
+            if self.destroy_selector.__class__.__name__ == "DQNSelector":
+                destroy_op, repair_op, severity, temp_mult = self.destroy_selector.select(state)
+
+                old_min_sev, old_max_sev = self.config.min_removal_percentage, self.config.max_removal_percentage
+                self.config.min_removal_percentage = severity
+                self.config.max_removal_percentage = severity
+            else:
+                destroy_op = self.destroy_selector.select(state)
+                repair_op = self.repair_selector.select(state)
+                temp_mult = 1.0  # No temperature control for MAB
 
             # Apply destroy-repair
             destroyed_solution = destroy_op.apply(self.current_solution)
@@ -131,11 +152,20 @@ class ALNS:
                 self.iterations_without_improvement += 1
 
             # Update selectors with reward signal
-            self.destroy_selector.update(destroy_op, score)
-            self.repair_selector.update(repair_op, score)
+            if self.destroy_selector.__class__.__name__ == "DQNSelector":
+                # DQN gets next state for learning
+                next_state = {**state, "current_objective": self.current_objective, "best_objective": self.best_objective}
+                self.destroy_selector.update(None, score, next_state)
+                # Restore config
+                self.config.min_removal_percentage, self.config.max_removal_percentage = old_min_sev, old_max_sev
+            else:
+                self.destroy_selector.update(destroy_op, score)
+                self.repair_selector.update(repair_op, score)
 
-            # Update temperature (geometric cooling)
+            # Update temperature (geometric cooling + DQN multiplier)
             self.temperature *= self.config.cooling_rate
+            if self.destroy_selector.__class__.__name__ == "DQNSelector":
+                self.temperature *= temp_mult
 
             # Logging
             if (iteration + 1) % self.config.log_interval == 0:

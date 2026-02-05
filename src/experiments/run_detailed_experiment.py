@@ -59,6 +59,19 @@ def run_single_experiment(
     elif selector_type == "thompson":
         destroy_selector = ThompsonSamplingSelector(destroy_ops)
         repair_selector = ThompsonSamplingSelector(repair_ops)
+    elif selector_type == "dqn":
+        # Load trained DQN policy
+        import torch
+        from src.alns.selectors.dqn import DQNSelector
+        from src.utils import find_project_root
+
+        dqn_selector = DQNSelector(destroy_ops, repair_ops)
+        policy_path = find_project_root() / "trained_models/dqn/dqn_policy.pth"
+        dqn_selector.q_network.load_state_dict(torch.load(policy_path))
+        dqn_selector.epsilon = 0.0  # No exploration during evaluation
+
+        destroy_selector = dqn_selector
+        repair_selector = None  # DQN controls both
     else:
         raise ValueError(f"Unknown selector type: {selector_type}")
 
@@ -76,7 +89,7 @@ def run_single_experiment(
 
     return ExperimentResult(
         instance_name=instance_path.stem,
-        algorithm_name=selector_type.capitalize(),
+        algorithm_name=selector_type.upper() if selector_type == "dqn" else selector_type.capitalize(),
         initial_objective=initial_objective,
         final_objective=final_objective,
         improvement_pct=improvement,

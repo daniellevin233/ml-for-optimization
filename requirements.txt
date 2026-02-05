@@ -6,3 +6,4 @@ pandas
 scikit-learn
 pymhlib
 line_profiler
+torch

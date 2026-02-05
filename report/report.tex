@@ -394,28 +394,114 @@ If switching to MAB, only Thompson is viable---UCB1's deterministic selection is
 % ============================================================
 \section{Reinforcement Learning Operator Selection}
 
-% TODO: Describe RL approach for operator selection
-% - State representation
-% - Action space (destroy operators)
-% - Reward function
-% - Learning algorithm (Q-learning, DQN, etc.)
-% - Results and comparison
+While MAB methods treat operator selection as a stateless multi-armed bandit, reinforcement learning can leverage 
+search state to make context-aware decisions. 
+We implement Deep Q-Networks (DQN) to control both operator selection and ALNS parameters jointly.
 
 \subsection{Method}
 
+The DQN selector extends MAB by (1) incorporating search state and (2) jointly controlling destroy/repair operators 
+plus severity and temperature multipliers. 
+The state representation captures 7 features: normalized objectives 
+(current/initial, best/initial, current/best), search stagnation (iterations\_without\_improvement / max\_iterations), 
+temperature decay (current\_temp / initial\_temp), and recent performance metrics (acceptance rate, improvement rate over last 100 iterations).
+
+The action space is discrete with 144 actions encoding all combinations: 3 destroy operators $\times$ 3 repair 
+operators $\times$ 4 severity levels [0.1, 0.2, 0.3, 0.4] $\times$ 4 temperature multipliers [0.5, 1.0, 1.5, 2.0]. 
+This joint control allows DQN to adapt neighborhood size and acceptance criteria dynamically based on search progress---something MAB cannot do.
+
+The Q-network is a simple 2-layer MLP (7 $\rightarrow$ 64 $\rightarrow$ 64 $\rightarrow$ 144) trained with standard DQN: 
+experience replay (10k buffer, batch size 64), target network updated every 100 steps, discount $\gamma = 0.99$, 
+Adam optimizer (lr=0.001). 
+Epsilon-greedy exploration decays from 1.0 to 0.1 over training. 
+The reward signal is inherited from ALNS: solution improvement normalized by initial objective.
+
+Training uses sequential episodes across all instances from sizes 50 and 100 (training set). 
+Each instance runs for 500 iterations (max 100s), constituting one episode. 
+The shared DQN accumulates experience across all episodes, learning a general policy rather than per-instance strategies.
+
 \subsection{Results}
 
-% ============================================================
-% Comparison
-% ============================================================
-\section{Comparison and Analysis}
+Training used 60 episodes (30 instances each from sizes 50 and 100) with 500 iterations per episode.
+The policy achieved 19.8\% average improvement, with epsilon decaying smoothly to 0.1 over training.
+Performance remained consistent across episode sizes: 20.8\% for $n=50$ and 18.8\% for $n=100$ (Figure~\ref{fig:dqn-training}),
+suggesting the network learned generalizable patterns rather than overfitting to specific instance characteristics.
 
-% TODO: Compare all three approaches
-% - Adaptive weights (baseline)
-% - MAB operator selection
-% - RL operator selection
-% - Statistical tests (Wilcoxon)
-% - Plots showing convergence, operator selection frequencies
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{dqn_training_curves}
+\caption{DQN training progress: improvement per episode with mean (left) and improvement distribution by instance size (right)}
+\label{fig:dqn-training}
+\end{figure}
+
+Evaluation on 120 test instances (sizes 50, 100, 200, 500) reveals an interesting pattern: DQN performs better on smaller instances but Thompson dominates on larger ones (Table~\ref{tab:dqn-results}, Figure~\ref{fig:dqn-comparison}). 
+DQN wins decisively at $n=100$ (29-1, $-4.4\%$, $p<0.001$) and marginally at $n=50$ (31-29, $-1.5\%$, $p=0.007$). 
+However, Thompson wins strongly at $n=500$ (28-2, $+5.1\%$, $p<0.001$) and at $n=200$ (20-10, $+2.0\%$, $p=0.007$). 
+Overall, Thompson achieves $3.4\%$ lower total objective across all instances.
+
+\begin{table}[H]
+\centering
+\caption{Thompson vs DQN on test instances}
+\label{tab:dqn-results}
+\begin{tabular}{r r r r r r}
+\toprule
+Size & Thompson Obj & DQN Obj & \% Diff & Wins (T/D) & $p$-value \\
+\midrule
+50 & $22444 \pm 21087$ & $23452 \pm 22168$ & $-1.5\%$ & 29/31 & 0.007* \\
+100 & $3872 \pm 284$ & $3698 \pm 267$ & $-4.4\%$ & 1/29 & <0.001*** \\
+200 & $10780 \pm 956$ & $10983 \pm 879$ & $+2.0\%$ & 20/10 & 0.007* \\
+500 & $43386 \pm 3498$ & $45522 \pm 2941$ & $+5.1\%$ & 28/2 & <0.001*** \\
+\midrule
+\textbf{Total} & 1,786,215 & 1,847,584 & $+3.4\%$ & 78/72 & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{Thompson_vs_DQN_50-100-200-500_20260204_232358}
+\caption{Thompson vs DQN: distribution of percentage differences and win counts by instance size. Positive values favor Thompson.}
+\label{fig:dqn-comparison}
+\end{figure}
+
+Parameter evolution on a sample instance (Figure~\ref{fig:dqn-params}) reveals how DQN adapts to search dynamics.
+Both severity and temperature multipliers fluctuate throughout rather than converging to fixed values.
+The overlaid stagnation periods (red shading) show that parameter choices correlate with search progress---DQN adjusts its strategy based on whether the search is making progress or plateauing.
+The objective convergence plot confirms the search successfully improves the solution despite these dynamic parameter adjustments.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{dqn_parameter_evolution_instance31_nreq100_nveh2_gamma86}
+\caption{DQN parameter evolution with context: severity (top) and temperature multiplier (middle) choices overlaid with search stagnation (red shading), plus objective convergence (bottom)}
+\label{fig:dqn-params}
+\end{figure}
+
+\subsection{Discussion}
+
+The results reveal a critical limitation: DQN's performance deteriorates with instance size.
+The most likely reason for that is its limitation to the instances it is trained on, meaning it cannot be generalized
+beyond the type of instances it was trained on. 
+While it excels on small instances ($n=100$: $-4.4\%$), it fails dramatically on large ones ($n=500$: $+5.1\%$). 
+This pattern suggests a fundamental mismatch between training and deployment.
+
+DQN trained exclusively on sizes 50-100, then deployed on sizes up to 500. 
+The learned policy apparently doesn't generalize beyond its training distribution. 
+Larger instances have different characteristics (longer runtimes allow more iterations, different neighborhood structures, altered acceptance dynamics), and the frozen policy cannot adapt. 
+Thompson Sampling, learning online from scratch on each instance, adapts naturally regardless of size.
+
+The training approach compounds this issue. 
+With only 60 training episodes and $\sim$5k network parameters, DQN may have overfit to small-instance patterns. 
+The 7-feature state representation captures normalized metrics (objective ratios, temperature decay, stagnation), which should theoretically scale across sizes. 
+However, the absolute search dynamics clearly differ enough that the learned Q-values fail to transfer.
+
+The joint action space (144 discrete actions) creates another challenge. 
+While controlling severity and temperature offers flexibility, it increases sample complexity. 
+With limited training data, the network may not learn robust associations between states and parameter choices. 
+MAB's simpler operator-only selection requires less data to identify good strategies.
+
+Most fundamentally, the problem may not benefit from offline learned policies. 
+If optimal operator choice varies primarily with instance characteristics (size, structure) rather than search state, then per-instance online adaptation (Thompson) beats pre-trained policies (DQN). 
+The size-dependent performance strongly supports this: what works for $n=100$ differs from $n=500$, and no single frozen policy handles both well.
 
 % ============================================================
 % Conclusion
