@@ -295,8 +295,11 @@ Looking at a single instance (\texttt{instance61\_nreq100\_nveh2\_gamma91}, 500 
 
 \textbf{Convergence} (Figure~\ref{fig:convergence}):
 All three start at $\sim$4900 but diverge quickly.
-Thompson achieves the best result (4184.4, 15.0\% improvement), Adaptive is close behind (4202.5, 14.6\%), but UCB1 plateaus early (4394.0, only 9.8\%).
-UCB1 stagnates around iteration 150, while Thompson keeps finding improvements even past iteration 400.
+Thompson achieves the best result (4184.4, 15.0\% improvement), Adaptive is close behind (4202.5, 14.6\%), and UCB1 is last (4394.0, only 9.8\%).
+All three seem to reach a plateau around 200th iteration, however both UCB1 and Adaptive manage to break out after 450th
+iteration which indicates the exploration is not exhausted yet.
+With more iterations we would probably see a similar picture where from time to time each operator selector manages to break out of plateaus.
+But in the end of the day Thompson seems to be the strongest one here as it converges to lower objective value early.
 
 \begin{figure}[H]
 \centering
@@ -305,6 +308,7 @@ UCB1 stagnates around iteration 150, while Thompson keeps finding improvements e
 \label{fig:convergence}
 \end{figure}
 
+\noindent
 \textbf{Operator selection patterns:}
 
 \textbf{Thompson} (Figures~\ref{fig:thompson-destroy},~\ref{fig:thompson-repair}):
@@ -312,7 +316,7 @@ Identifies the winning combination early and sticks with it: WorstCost (72\%) + 
 Frequencies stay stable throughout---no dramatic exploration-to-exploitation shift, just steady probabilistic sampling.
 
 \textbf{UCB1} (Figures~\ref{fig:ucb1-destroy},~\ref{fig:ucb1-repair}):
-Locks onto Random destroy (87\%) while barely using WorstCost (6\%)---the wrong choice!
+Locks onto Random destroy (87\%) while barely using WorstCost (6\%)---seems to be the wrong choice for this problem.
 Thompson proves WorstCost is better, but UCB1's deterministic selection locked in after early luck.
 Gets repair right (87\% Greedy) but the bad destroy choice kills performance.
 
@@ -374,17 +378,14 @@ This diversity explains why Adaptive is competitive---no catastrophic over-commi
 
 \subsection{Discussion}
 
-\textbf{Main findings:}
 Thompson Sampling wins overall (67-53 vs Adaptive, 108-12 vs UCB1) but the margin over the baseline is small (+0.6\%).
 UCB1 performs significantly worse (-7.6\% vs Adaptive) due to premature convergence---it locks onto Random destroy operator which happens to be the wrong choice.
 The baseline Adaptive Weights are surprisingly competitive because they maintain operator diversity (30-40\% for each), avoiding UCB1's catastrophic over-exploitation.
 
-\textbf{Why Thompson works:}
-Probabilistic sampling naturally balances exploration and exploitation.
+Thompson works well because probabilistic sampling naturally balances exploration and exploitation.
 Even after identifying WorstCost as the best operator (72\% selection), it keeps sampling alternatives (15\% Random, 12\% LongestRoute).
 This prevents UCB1-style lock-in while still exploiting knowledge.
 
-\textbf{Bottom line:}
 For this problem, the simple baseline is hard to beat.
 Thompson provides marginal gains but adds complexity.
 If switching to MAB, only Thompson is viable---UCB1's deterministic selection is too greedy for long ALNS runs.
@@ -394,26 +395,26 @@ If switching to MAB, only Thompson is viable---UCB1's deterministic selection is
 % ============================================================
 \section{Reinforcement Learning Operator Selection}
 
-While MAB methods treat operator selection as a stateless multi-armed bandit, reinforcement learning can leverage 
-search state to make context-aware decisions. 
-We implement Deep Q-Networks (DQN) to control both operator selection and ALNS parameters jointly.
+While MAB methods treat operator selection as a stateless multi-armed bandit, reinforcement learning can leverage
+search state to make context-aware decisions.
+Following Reijnen et al.~\cite{reijnen2024dralns}, we implement Deep Q-Networks (DQN) to control both operator selection and ALNS parameters jointly.
 
 \subsection{Method}
 
-The DQN selector extends MAB by (1) incorporating search state and (2) jointly controlling destroy/repair operators 
-plus severity and temperature multipliers. 
-The state representation captures 7 features: normalized objectives 
-(current/initial, best/initial, current/best), search stagnation (iterations\_without\_improvement / max\_iterations), 
+The DQN selector extends MAB by (1) incorporating search state and (2) jointly controlling destroy/repair operators
+plus severity and temperature multipliers~\cite{reijnen2024dralns}.
+The state representation captures 7 features: normalized objectives
+(current/initial, best/initial, current/best), search stagnation (iterations\_without\_improvement / max\_iterations),
 temperature decay (current\_temp / initial\_temp), and recent performance metrics (acceptance rate, improvement rate over last 100 iterations).
 
-The action space is discrete with 144 actions encoding all combinations: 3 destroy operators $\times$ 3 repair 
-operators $\times$ 4 severity levels [0.1, 0.2, 0.3, 0.4] $\times$ 4 temperature multipliers [0.5, 1.0, 1.5, 2.0]. 
+The action space is discrete with 144 actions encoding all combinations: 3 destroy operators $\times$ 3 repair
+operators $\times$ 4 severity levels [0.1, 0.2, 0.3, 0.4] $\times$ 4 temperature multipliers [0.5, 1.0, 1.5, 2.0].
 This joint control allows DQN to adapt neighborhood size and acceptance criteria dynamically based on search progress---something MAB cannot do.
 
-The Q-network is a simple 2-layer MLP (7 $\rightarrow$ 64 $\rightarrow$ 64 $\rightarrow$ 144) trained with standard DQN: 
-experience replay (10k buffer, batch size 64), target network updated every 100 steps, discount $\gamma = 0.99$, 
-Adam optimizer (lr=0.001). 
-Epsilon-greedy exploration decays from 1.0 to 0.1 over training. 
+The Q-network is a simple 2-layer MLP (7 $\rightarrow$ 64 $\rightarrow$ 64 $\rightarrow$ 144) trained with standard DQN.
+We use DQN rather than PPO (the algorithm in~\cite{reijnen2024dralns}) for simplicity: DQN's discrete action handling and experience replay align well with our 144-action space and limited training data, while requiring less implementation complexity than actor-critic methods.
+Training uses experience replay (10k buffer, batch size 64), target network updated every 100 steps, discount $\gamma = 0.99$, and Adam optimizer (lr=0.001).
+Epsilon-greedy exploration decays from 1.0 to 0.1 over training.
 The reward signal is inherited from ALNS: solution improvement normalized by initial objective.
 
 Training uses sequential episodes across all instances from sizes 50 and 100 (training set). 
@@ -422,10 +423,10 @@ The shared DQN accumulates experience across all episodes, learning a general po
 
 \subsection{Results}
 
-Training used 60 episodes (30 instances each from sizes 50 and 100) with 500 iterations per episode.
-The policy achieved 19.8\% average improvement, with epsilon decaying smoothly to 0.1 over training.
+The policy was trained on 60 episodes (30 instances each from sizes 50 and 100) with 500 iterations per episode.
+Training achieved 19.8\% average improvement with epsilon decaying smoothly to 0.1.
 Performance remained consistent across episode sizes: 20.8\% for $n=50$ and 18.8\% for $n=100$ (Figure~\ref{fig:dqn-training}),
-suggesting the network learned generalizable patterns rather than overfitting to specific instance characteristics.
+suggesting the network learned generalizable patterns rather than overfitting to specific instances.
 
 \begin{figure}[H]
 \centering
@@ -434,9 +435,21 @@ suggesting the network learned generalizable patterns rather than overfitting to
 \label{fig:dqn-training}
 \end{figure}
 
-Evaluation on 120 test instances (sizes 50, 100, 200, 500) reveals an interesting pattern: DQN performs better on smaller instances but Thompson dominates on larger ones (Table~\ref{tab:dqn-results}, Figure~\ref{fig:dqn-comparison}). 
-DQN wins decisively at $n=100$ (29-1, $-4.4\%$, $p<0.001$) and marginally at $n=50$ (31-29, $-1.5\%$, $p=0.007$). 
-However, Thompson wins strongly at $n=500$ (28-2, $+5.1\%$, $p<0.001$) and at $n=200$ (20-10, $+2.0\%$, $p=0.007$). 
+Parameter evolution on a sample instance (Figure~\ref{fig:dqn-params}) reveals how the learned policy operates.
+Both severity and temperature multipliers go up and down throughout rather than converging to fixed values.
+The overlaid stagnation periods (red shading) show that parameter choices correlate with search progress---DQN adjusts its strategy based on whether the search is making progress or plateauing.
+The objective convergence confirms the policy successfully guides the search toward better solutions.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.95\textwidth]{dqn_parameter_evolution_instance31_nreq100_nveh2_gamma86}
+\caption{DQN parameter evolution with context: severity (top) and temperature multiplier (middle) choices overlaid with search stagnation (red shading), plus objective convergence (bottom)}
+\label{fig:dqn-params}
+\end{figure}
+
+Evaluation on 120 test instances (sizes 50, 100, 200, 500) reveals a size-dependent pattern: DQN performs better on smaller instances but Thompson dominates on larger ones (Table~\ref{tab:dqn-results}, Figure~\ref{fig:dqn-comparison}).
+DQN wins decisively at $n=100$ (29-1, $-4.4\%$, $p<0.001$) and marginally at $n=50$ (31-29, $-1.5\%$, $p=0.007$).
+However, Thompson wins strongly at $n=500$ (28-2, $+5.1\%$, $p<0.001$) and at $n=200$ (20-10, $+2.0\%$, $p=0.007$).
 Overall, Thompson achieves $3.4\%$ lower total objective across all instances.
 
 \begin{table}[H]
@@ -464,25 +477,11 @@ Size & Thompson Obj & DQN Obj & \% Diff & Wins (T/D) & $p$-value \\
 \label{fig:dqn-comparison}
 \end{figure}
 
-Parameter evolution on a sample instance (Figure~\ref{fig:dqn-params}) reveals how DQN adapts to search dynamics.
-Both severity and temperature multipliers fluctuate throughout rather than converging to fixed values.
-The overlaid stagnation periods (red shading) show that parameter choices correlate with search progress---DQN adjusts its strategy based on whether the search is making progress or plateauing.
-The objective convergence plot confirms the search successfully improves the solution despite these dynamic parameter adjustments.
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.95\textwidth]{dqn_parameter_evolution_instance31_nreq100_nveh2_gamma86}
-\caption{DQN parameter evolution with context: severity (top) and temperature multiplier (middle) choices overlaid with search stagnation (red shading), plus objective convergence (bottom)}
-\label{fig:dqn-params}
-\end{figure}
-
 \subsection{Discussion}
 
 The results reveal a critical limitation: DQN's performance deteriorates with instance size.
-The most likely reason for that is its limitation to the instances it is trained on, meaning it cannot be generalized
-beyond the type of instances it was trained on. 
-While it excels on small instances ($n=100$: $-4.4\%$), it fails dramatically on large ones ($n=500$: $+5.1\%$). 
-This pattern suggests a fundamental mismatch between training and deployment.
+While it excels on small instances ($n=100$: $-4.4\%$), it fails dramatically on large ones ($n=500$: $+5.1\%$).
+This pattern suggests the learned policy doesn't generalize beyond its training distribution, creating a fundamental mismatch between training and deployment.
 
 DQN trained exclusively on sizes 50-100, then deployed on sizes up to 500. 
 The learned policy apparently doesn't generalize beyond its training distribution. 
@@ -504,16 +503,6 @@ If optimal operator choice varies primarily with instance characteristics (size,
 The size-dependent performance strongly supports this: what works for $n=100$ differs from $n=500$, and no single frozen policy handles both well.
 
 % ============================================================
-% Conclusion
-% ============================================================
-\section{Conclusion}
-
-% TODO: Summary of findings
-% - Which approach works best and when
-% - Trade-offs between methods
-% - Lessons learned
-
-% ============================================================
 % References
 % ============================================================
 \begin{thebibliography}{9}
@@ -527,6 +516,11 @@ arXiv preprint arXiv:2410.07393.
 Phan, T., Huang, T., Dilkina, B., \& Koenig, S. (2024).
 \textit{Adaptive Anytime Multi-Agent Path Finding Using Bandit-Based Large Neighborhood Search}.
 In Proceedings of the AAAI Conference on Artificial Intelligence (AAAI).
+
+\bibitem{reijnen2024dralns}
+Reijnen, R., Zhang, Y., Lau, H. C., \& Bukhsh, Z. (2024).
+\textit{Online Control of Adaptive Large Neighborhood Search Using Deep Reinforcement Learning}.
+In Proceedings of the 34th International Conference on Automated Planning and Scheduling (ICAPS).
 
 \end{thebibliography}
 
