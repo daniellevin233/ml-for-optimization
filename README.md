@@ -15,5 +15,5 @@ The report is in `report.pdf` as well as in https://www.overleaf.com/2581326695r
 For the 2nd assignment:
 
 ```shell
-zip -r submission_assignment_2_DanielLevin.zip ./ -x "venv/*" -x "*.lprof" -x "instances/*" -x "data/*" -x "papers/*" -x "*.zip" -x ".git/*" -x ".idea/*" -x "*__pycache__/*"
+zip -r submission_assignment_2_DanielLevin.zip ./ -x "venv/*" -x "*.lprof" -x "*_instances/*" -x "data/*" -x "papers/*" -x "*.zip" -x ".git/*" -x ".idea/*" -x "*__pycache__/*" -x "*/assignment1/*" -x "out/*" -x "trained_models/*" -x "src/experiments/results/*"
 ```
